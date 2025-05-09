@@ -136,7 +136,7 @@ start_button.pack(pady=10)
 links_frame = tk.Frame(root)
 links_frame.pack(side="bottom", pady=10)
 
-discord_btn = tk.Button(links_frame, text="Support Discord", command=lambda: webbrowser.open("https://discord.gg/tonserveur"))
+discord_btn = tk.Button(links_frame, text="Support Discord", command=lambda: webbrowser.open("https://discord.gg/aXz6TVeX5d"))
 discord_btn.pack(side="left", padx=10)
 
 site_btn = tk.Button(links_frame, text="Site Web", command=lambda: webbrowser.open("https://tonsiteweb.com"))
