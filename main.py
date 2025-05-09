@@ -24,7 +24,7 @@ available_versions = [v['id'] for v in get_available_versions(game_directory) if
 def check_for_update():
     try:
         version_url = "https://tonsiteweb.com/launcher/version.txt"
-        script_url = "https://tonsiteweb.com/launcher/main.py"
+        script_url = "https://raw.githubusercontent.com/Ender-user/amclauncher/refs/heads/main/main.py"
 
         latest_version = urllib.request.urlopen(version_url).read().decode("utf-8").strip()
 
