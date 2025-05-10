@@ -5,29 +5,45 @@ import webbrowser
 import os
 import urllib.request
 import subprocess
+import time
 
 import minecraft_launcher_lib
 from minecraft_launcher_lib.install import install_minecraft_version
 from minecraft_launcher_lib.command import get_minecraft_command
 from minecraft_launcher_lib.utils import get_available_versions
 
-# Version du launcher
+from pypresence import Presence  # Discord Rich Presence
+
+# --- CONFIGURATION DISCORD ---
+DISCORD_CLIENT_ID = "123456789012345678"  # Remplace par ton vrai ID client Discord
+rpc = None
+
+def start_discord_rpc(pseudo, version):
+    global rpc
+    try:
+        rpc = Presence(DISCORD_CLIENT_ID)
+        rpc.connect()
+        rpc.update(
+            state=f"Version {version}",
+            details="Joue à A.MC.Launcher",
+            large_image="logo",  # nom de l’image ajoutée sur Discord Developer Portal
+            large_text="A.MC.Launcher",
+            start=time.time()
+        )
+    except Exception as e:
+        print(f"Erreur RPC Discord : {e}")
+
+# --- CONFIGURATION DU LAUNCHER ---
 LAUNCHER_VERSION = "1.0"
-
-# Chemin vers .minecraft
 game_directory = os.path.join(os.getcwd(), ".minecraft")
-
-# Liste des versions
 available_versions = [v['id'] for v in get_available_versions(game_directory) if not v['id'].endswith("json")]
 
-# Fonction de mise à jour
 def check_for_update():
     try:
         version_url = "https://raw.githubusercontent.com/Ender-user/amclauncher/refs/heads/main/version.txt"
         script_url = "https://raw.githubusercontent.com/Ender-user/amclauncher/refs/heads/main/main.py"
 
         latest_version = urllib.request.urlopen(version_url).read().decode("utf-8").strip()
-
         if latest_version != LAUNCHER_VERSION:
             if messagebox.askyesno("Mise à jour disponible", f"Nouvelle version {latest_version} disponible.\nVoulez-vous mettre à jour ?"):
                 new_code = urllib.request.urlopen(script_url).read()
@@ -38,13 +54,12 @@ def check_for_update():
     except Exception as e:
         print(f"Erreur mise à jour : {e}")
 
-# Crée la fenêtre principale
+# --- INTERFACE GRAPHIQUE ---
 root = tk.Tk()
 root.title("A.MC.Launcher")
 root.geometry("600x400")
-root.iconbitmap("launcher.ico")  # Icône personnalisée
+root.iconbitmap("launcher.ico")
 
-# Widgets
 tk.Label(root, text="Pseudo :").pack()
 pseudo_entry = tk.Entry(root)
 pseudo_entry.pack()
@@ -57,7 +72,6 @@ version_menu.pack()
 progress = ttk.Progressbar(root, orient="horizontal", length=400, mode="determinate")
 progress.pack(pady=10)
 
-# Fonction pour afficher les logs
 def open_log_window():
     log_win = tk.Toplevel(root)
     log_win.title("Logs du jeu")
@@ -66,18 +80,15 @@ def open_log_window():
     log_text.pack(expand=True, fill="both")
     return log_text
 
-# Progress bar update
 def update_progress(value, message=""):
     progress['value'] = value
     root.update_idletasks()
     if message:
         print(message)
 
-# Vérification fictive de compte premium
 def is_premium_account(pseudo):
-    return False  # À personnaliser
+    return False
 
-# Lancement du jeu
 def start_game():
     pseudo = pseudo_entry.get()
     version = version_var.get()
@@ -115,6 +126,9 @@ def start_game():
             command = get_minecraft_command(version, game_directory, options)
             update_progress(80, "Commande prête.")
 
+            # --- Discord RPC ---
+            start_discord_rpc(pseudo, version)
+
             log("Démarrage de Minecraft...\n")
             update_progress(100)
 
@@ -128,11 +142,10 @@ def start_game():
 
     threading.Thread(target=launch).start()
 
-# Bouton de démarrage
+# --- BOUTONS ---
 start_button = tk.Button(root, text="Lancer Minecraft", command=start_game)
 start_button.pack(pady=10)
 
-# Liens externes
 links_frame = tk.Frame(root)
 links_frame.pack(side="bottom", pady=10)
 
@@ -142,7 +155,5 @@ discord_btn.pack(side="left", padx=10)
 site_btn = tk.Button(links_frame, text="Site Web", command=lambda: webbrowser.open("https://tonsiteweb.com"))
 site_btn.pack(side="right", padx=10)
 
-# Vérifie la mise à jour au démarrage
 check_for_update()
-
 root.mainloop()
