@@ -15,7 +15,7 @@ from minecraft_launcher_lib.utils import get_available_versions
 from pypresence import Presence  # Discord Rich Presence
 
 # --- CONFIGURATION DISCORD ---
-DISCORD_CLIENT_ID = "123456789012345678"  # Remplace par ton vrai ID client Discord
+DISCORD_CLIENT_ID = "1367931604785168385"  # Remplace par ton vrai ID client Discord
 rpc = None
 
 def start_discord_rpc(pseudo, version):
